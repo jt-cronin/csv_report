@@ -1,13 +1,14 @@
 class Account
+  attr_accessor :name
+  attr_accessor :transactions
+
   def initialize(name, transactions)
     @name = name
     @transactions = transactions
   end
 
   def category_total(category)
-    total = 0
-    @transactions[category].each { |amount| total += amount }
-    total.round(2)
+    @transactions[category].sum.round(2)
   end
 
   def category_average(category)
@@ -16,14 +17,14 @@ class Account
 
   def account_balance
     balance = 0
-    @transactions.each { |category, amounts| balance += category_total(category) }
+    @transactions.each_key { |category| balance += category_total(category) }
     balance.round(2)
   end
 
   def displayCSV
     puts "Account: #{@name}... Balance: $#{self.account_balance}"
     puts "Category".ljust(20) + "Total Spent".ljust(20) + "Average Transaction"
-    @transactions.each do |category, amounts|
+    @transactions.each_key do |category|
       puts category.to_s.ljust(20) + "$" + self.category_total(category).to_s.ljust(20) + "$" + self.category_average(category).to_s.ljust(20)
     end
     nil
@@ -31,12 +32,14 @@ class Account
 
   def displayHTML
     puts "<h1>#{@name}</h1>\n<p>Total Balance: $#{self.account_balance}</p>\n<hr>\n<table>\n  <tr>\n    <th>Category</th>\n    <th>Total Spent</th>\n    <th>Avg. Transaction</th>\n  </tr>\n\n"
-    @transactions.each do |category, amounts|
+    @transactions.each_key do |category|
       puts "  <tr>\n    <td>#{category}</td>\n    <td>$#{self.category_total(category).to_s}</td>\n    <td>$#{self.category_average(category).to_s}</td>\n  </tr>"
     end
     puts "</table>"
   end
 end
+
+###############################################################################
 
 def getNames accounts
   CSV.foreach("accounts.txt", {headers: true, return_headers: false}) do |row|
@@ -68,3 +71,5 @@ def readCSV
   getTransactions(getCategories(getNames(accounts)))
   accounts
 end
+
+###############################################################################
