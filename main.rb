@@ -138,6 +138,7 @@ def deleteAccount
     end
   end
   FileUtils.mv 'temp.txt', 'accounts.txt'
+  @raw_account_data = readCSV
   getAction
 end
 
